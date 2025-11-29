@@ -83,6 +83,22 @@ jobs:
           name: linux-builds
           path: artifacts/
           
+      - name: Create Arch Linux package
+        run: |
+          mkdir -p arch-package
+          cp PKGBUILD arch-package/
+          cp -r public arch-package/
+          cp -r src arch-package/
+          cp -r electron arch-package/
+          cp package.json arch-package/
+          cp index.html arch-package/
+          cp vite.config.js arch-package/
+          cp install-arch.sh arch-package/
+          chmod +x arch-package/install-arch.sh
+          cd arch-package
+          tar -czf ../artifacts/project-hub-arch.tar.gz *
+          cd ..
+          
       - name: List downloaded artifacts
         run: ls -la artifacts/
           

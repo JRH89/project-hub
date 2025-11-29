@@ -1,7 +1,7 @@
 {
   "name": "project-hub",
   "private": true,
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "A lightweight desktop application to organize complex projects with scattered files",
   "author": "Jared <jaredroberthooker@gmail.com>",
   "license": "MIT",
@@ -14,7 +14,8 @@
     "preview": "vite preview",
     "package": "npm run build && electron-builder",
     "package:win": "npm run build && electron-builder --win",
-    "package:linux": "npm run build && electron-builder --linux"
+    "package:linux": "npm run build && electron-builder --linux",
+    "bump": "node bump-version.js"
   },
   "devDependencies": {
     "concurrently": "^9.2.1",

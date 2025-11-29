@@ -1,14 +1,14 @@
 # Maintainer: Your Name <your.email@example.com>
 pkgname=project-hub
-pkgver=1.0.0
+pkgver=$(node -p "require('./package.json').version")
 pkgrel=1
 pkgdesc="A lightweight desktop application to organize complex projects with scattered files"
 arch=('x86_64')
-url="https://github.com/yourusername/project-hub"
+url="https://github.com/JRH89/project-hub"
 license=('MIT')
 depends=('electron')
 makedepends=('npm')
-source=("$pkgname-$pkgver.tar.gz::https://github.com/yourusername/project-hub/archive/v$pkgver.tar.gz")
+source=("$pkgname-$pkgver.tar.gz::https://github.com/JRH89/project-hub/archive/v$pkgver.tar.gz")
 sha256sums=('SKIP')
 
 build() {
