@@ -25,7 +25,7 @@ package() {
     cp -r dist electron node_modules "$pkgdir/usr/lib/$pkgname/"
     
     # Install icon
-    install -Dm644 icon.png "$pkgdir/usr/share/pixmaps/$pkgname.png"
+    install -Dm644 public/icon.png "$pkgdir/usr/share/pixmaps/$pkgname.png"
     
     # Create desktop entry
     install -Dm644 /dev/stdin "$pkgdir/usr/share/applications/$pkgname.desktop" <<EOF
@@ -41,6 +41,7 @@ EOF
     # Create launcher script
     install -Dm755 /dev/stdin "$pkgdir/usr/bin/$pkgname" <<EOF
 #!/bin/sh
-exec electron /usr/lib/$pkgname/electron/main.js "\$@"
+cd /usr/lib/$pkgname
+exec electron . "\$@"
 EOF
 }
