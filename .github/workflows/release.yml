@@ -82,6 +82,11 @@ jobs:
       - name: List downloaded artifacts
         run: ls -la artifacts/
           
+      - name: Debug secrets
+        run: |
+          echo "Checking available secrets..."
+          echo "GH_TOKEN exists: ${{ secrets.GH_TOKEN != '' }}"
+          
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
@@ -90,4 +95,4 @@ jobs:
           prerelease: false
           generate_release_notes: true
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
