@@ -38,6 +38,10 @@ if ! pacman -Q base-devel &> /dev/null; then
     missing_deps+=("base-devel")
 fi
 
+if ! pacman -Q pacman-contrib &> /dev/null; then
+    missing_deps+=("pacman-contrib")
+fi
+
 if ! pacman -Q electron &> /dev/null; then
     missing_deps+=("electron")
 fi
@@ -75,7 +79,12 @@ cd "$BUILD_DIR"
 
 # Update package checksum
 print_status "Updating package checksum..."
-updpkgsums
+if command -v updpkgsums &> /dev/null; then
+    updpkgsums
+else
+    print_warning "updpkgsums not found, using SKIP checksums"
+    # Keep SKIP checksums for simplicity
+fi
 
 # Build the package
 print_status "Building package with makepkg..."
