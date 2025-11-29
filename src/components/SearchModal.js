@@ -11,6 +11,17 @@ export class SearchModal {
 
         this.render();
         this.bindEvents();
+
+        // Load index immediately
+        (async () => {
+            const files = await Store.getIndexedFiles();
+            if (files && files.length > 0) {
+                Search.init(files);
+                console.log('Index loaded:', files.length, 'files');
+            } else {
+                console.log('No indexed files found. Click "Quick Scan" to scan common folders.');
+            }
+        })();
     }
 
     bindEvents() {
@@ -24,16 +35,6 @@ export class SearchModal {
         this.isOpen = true;
         this.container.style.display = 'flex';
         this.container.querySelector('input').focus();
-
-        // Initialize search with a default scan if needed, or wait for user input
-        // For now, let's just show the UI. 
-        // In a real app, we might scan a default dir or let user pick.
-        // For this demo, let's scan the User's Desktop or Documents as a demo source?
-        // Or just ask user to pick a folder to scan?
-        // Let's auto-scan the current project-hub folder for demo purposes if no files indexed.
-
-        // Actually, let's just wait for user to type and maybe trigger a scan if empty?
-        // Or add a "Scan Folder" button in the modal.
     }
 
     close() {
@@ -55,6 +56,7 @@ export class SearchModal {
         </div>
         <div class="search-bar">
           <input type="text" placeholder="Search files..." id="search-input">
+          <button id="quick-scan-btn">Quick Scan</button>
           <button id="scan-btn">Scan Dir</button>
         </div>
         <div class="search-results"></div>
@@ -65,9 +67,35 @@ export class SearchModal {
     `;
 
         this.container.querySelector('.close-btn').addEventListener('click', () => this.close());
+        this.container.querySelector('#quick-scan-btn').addEventListener('click', () => this.quickScan());
         this.container.querySelector('#scan-btn').addEventListener('click', () => this.scanDirectory());
         this.container.querySelector('#search-input').addEventListener('input', (e) => this.handleSearch(e.target.value));
         this.container.querySelector('#add-selected-btn').addEventListener('click', () => this.addSelected());
+    }
+
+    async quickScan() {
+        this.container.querySelector('#quick-scan-btn').textContent = 'Scanning...';
+
+        // Scan common user directories
+        const userHome = 'C:\\Users\\Jared';
+        const dirsToScan = [
+            `${userHome}\\Desktop`,
+            `${userHome}\\Documents`,
+            `${userHome}\\Downloads`,
+            `${userHome}\\Pictures`
+        ];
+
+        let allFiles = [];
+        for (const dir of dirsToScan) {
+            console.log('Scanning:', dir);
+            const files = await window.api.scanDirectory(dir);
+            allFiles = allFiles.concat(files);
+        }
+
+        Search.init(allFiles);
+        await Store.saveIndexedFiles(allFiles);
+        this.handleSearch(this.container.querySelector('#search-input').value);
+        this.container.querySelector('#quick-scan-btn').textContent = 'Quick Scan';
     }
 
     async scanDirectory() {
@@ -76,6 +104,7 @@ export class SearchModal {
             this.container.querySelector('#scan-btn').textContent = 'Scanning...';
             const files = await window.api.scanDirectory(dirPath);
             Search.init(files);
+            await Store.saveIndexedFiles(files);
             this.handleSearch(this.container.querySelector('#search-input').value);
             this.container.querySelector('#scan-btn').textContent = 'Scan Dir';
         }
@@ -116,8 +145,6 @@ export class SearchModal {
         if (this.project && this.selectedFiles.size > 0) {
             this.project.files.push(...this.selectedFiles);
             await Store.saveProject(this.project);
-            // Refresh file list (hacky way via global event or callback, but let's just reload page or re-fetch)
-            // Better: dispatch event
             document.dispatchEvent(new CustomEvent('project-updated', { detail: this.project }));
             this.close();
         }

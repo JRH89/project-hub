@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow, ipcMain, shell, dialog } from 'electron';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import Store from 'electron-store';
@@ -62,21 +62,41 @@ ipcMain.handle('save-project', (event, project) => {
     return true;
 });
 
+ipcMain.handle('get-indexed-files', () => {
+    return store.get('indexedFiles', []);
+});
+
+ipcMain.handle('save-indexed-files', (event, files) => {
+    store.set('indexedFiles', files);
+    return true;
+});
+
 ipcMain.handle('scan-directory', async (event, dirPath) => {
     try {
         const fs = await import('fs/promises');
-        // Simple recursive scan
+        // Simple recursive scan with error handling
         async function getFiles(dir) {
-            const dirents = await fs.readdir(dir, { withFileTypes: true });
-            const files = await Promise.all(dirents.map((dirent) => {
-                const res = path.resolve(dir, dirent.name);
-                if (dirent.isDirectory()) {
-                    return getFiles(res);
-                } else {
-                    return { name: dirent.name, path: res };
-                }
-            }));
-            return Array.prototype.concat(...files);
+            try {
+                const dirents = await fs.readdir(dir, { withFileTypes: true });
+                const files = await Promise.all(dirents.map(async (dirent) => {
+                    const res = path.resolve(dir, dirent.name);
+                    if (dirent.isDirectory()) {
+                        try {
+                            return await getFiles(res);
+                        } catch (err) {
+                            // Skip directories we can't access
+                            console.log('Skipping inaccessible directory:', res);
+                            return [];
+                        }
+                    } else {
+                        return { name: dirent.name, path: res };
+                    }
+                }));
+                return Array.prototype.concat(...files);
+            } catch (err) {
+                console.log('Cannot read directory:', dir, err.message);
+                return [];
+            }
         }
         return await getFiles(dirPath);
     } catch (error) {
@@ -86,12 +106,10 @@ ipcMain.handle('scan-directory', async (event, dirPath) => {
 });
 
 ipcMain.handle('open-file', async (event, filePath) => {
-    const { shell } = require('electron');
     await shell.openPath(filePath);
 });
 
 ipcMain.handle('select-directory', async () => {
-    const { dialog } = require('electron');
     const result = await dialog.showOpenDialog({
         properties: ['openDirectory']
     });

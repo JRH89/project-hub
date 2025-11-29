@@ -6,4 +6,6 @@ contextBridge.exposeInMainWorld('api', {
     scanDirectory: (path) => ipcRenderer.invoke('scan-directory', path),
     openFile: (path) => ipcRenderer.invoke('open-file', path),
     selectDirectory: () => ipcRenderer.invoke('select-directory'),
+    getIndexedFiles: () => ipcRenderer.invoke('get-indexed-files'),
+    saveIndexedFiles: (files) => ipcRenderer.invoke('save-indexed-files', files),
 });
