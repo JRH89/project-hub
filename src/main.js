@@ -4,6 +4,7 @@ import { FileList } from './components/FileList.js';
 import { SearchModal } from './components/SearchModal.js';
 import { PromptModal } from './components/PromptModal.js';
 import { CLI } from './components/CLI.js';
+import UpdateNotification from './components/UpdateNotification.js';
 
 document.querySelector('#app').innerHTML = `
   <div class="title-bar">
@@ -30,6 +31,7 @@ document.querySelector('#app').innerHTML = `
   </div>
   <div id="search-modal-container"></div>
   <div id="prompt-modal-container"></div>
+  <div id="update-notification-container"></div>
 `;
 
 const promptModal = new PromptModal(document.querySelector('#prompt-modal-container'));
@@ -37,6 +39,12 @@ const projectList = new ProjectList(document.querySelector('#project-list'), pro
 const fileList = new FileList(document.querySelector('#file-list'));
 const searchModal = new SearchModal(document.querySelector('#search-modal-container'));
 const cli = new CLI(document.querySelector('#cli-container'));
+
+// Render update notification
+const updateContainer = document.querySelector('#update-notification-container');
+const updateRoot = document.createElement('div');
+updateContainer.appendChild(updateRoot);
+updateRoot.render = UpdateNotification;
 
 // Add project button handler
 document.querySelector('#add-project-btn').addEventListener('click', () => {
