@@ -3,6 +3,7 @@
   --sidebar-bg: #252526;
   --text-color: #e0e0e0;
   --accent-color: #007acc;
+  --primary-color: #4fc3f7;
   --hover-color: #333333;
   --border-color: #3e3e42;
   --font-family: 'Inter', system-ui, -apple-system, sans-serif;
@@ -50,7 +51,7 @@ input:focus {
 }
 
 /* Sidebar */
-#sidebar {
+.sidebar {
   width: 250px;
   background-color: var(--sidebar-bg);
   border-right: 1px solid var(--border-color);
@@ -58,7 +59,7 @@ input:focus {
   flex-direction: column;
 }
 
-.project-list-header {
+.sidebar-header {
   padding: 15px;
   display: flex;
   justify-content: space-between;
@@ -88,13 +89,20 @@ input:focus {
 }
 
 /* Main Content */
-#main-content {
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+#file-list {
   flex: 1;
   padding: 20px;
   overflow-y: auto;
 }
 
-.file-list-header {
+.header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -213,6 +221,11 @@ input:focus {
   margin-right: 10px;
 }
 
+.result-icon {
+  margin-right: 8px;
+  font-size: 1.2rem;
+}
+
 .result-name {
   font-weight: bold;
   margin-right: 10px;
@@ -260,4 +273,57 @@ button:hover {
 #add-selected-btn:hover,
 #add-file-btn:hover {
   background-color: #006bb3;
+}
+
+/* CLI Styles */
+#cli-container {
+  height: 200px;
+  background: #1e1e1e;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 14px;
+  padding: 10px;
+}
+
+.cli-output {
+  flex: 1;
+  overflow-y: auto;
+  margin-bottom: 10px;
+  color: #cccccc;
+}
+
+.cli-line {
+  margin-bottom: 4px;
+  word-break: break-all;
+}
+
+.cli-line.error {
+  color: #ff6b6b;
+}
+
+.cli-line.warning {
+  color: #feca57;
+}
+
+.cli-input-line {
+  display: flex;
+  align-items: center;
+}
+
+.cli-prompt {
+  color: var(--primary-color);
+  margin-right: 8px;
+  font-weight: bold;
+}
+
+.cli-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: inherit;
+  outline: none;
 }

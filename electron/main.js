@@ -1,7 +1,8 @@
-import { app, BrowserWindow, ipcMain, shell, dialog } from 'electron';
+import { app, BrowserWindow, ipcMain, shell, dialog, Menu, MenuItem, clipboard } from 'electron';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import Store from 'electron-store';
+import { exec } from 'child_process';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const store = new Store();
@@ -10,6 +11,7 @@ function createWindow() {
     const win = new BrowserWindow({
         width: 1200,
         height: 800,
+        icon: path.join(__dirname, '../icon.png'),
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
             nodeIntegration: false,
@@ -74,7 +76,6 @@ ipcMain.handle('save-indexed-files', (event, files) => {
 ipcMain.handle('scan-directory', async (event, dirPath) => {
     try {
         const fs = await import('fs/promises');
-        // Simple recursive scan with error handling
         async function getFiles(dir) {
             try {
                 const dirents = await fs.readdir(dir, { withFileTypes: true });
@@ -82,14 +83,14 @@ ipcMain.handle('scan-directory', async (event, dirPath) => {
                     const res = path.resolve(dir, dirent.name);
                     if (dirent.isDirectory()) {
                         try {
-                            return await getFiles(res);
+                            const children = await getFiles(res);
+                            return [{ name: dirent.name, path: res, type: 'directory' }, ...children];
                         } catch (err) {
-                            // Skip directories we can't access
                             console.log('Skipping inaccessible directory:', res);
-                            return [];
+                            return [{ name: dirent.name, path: res, type: 'directory' }];
                         }
                     } else {
-                        return { name: dirent.name, path: res };
+                        return { name: dirent.name, path: res, type: 'file' };
                     }
                 }));
                 return Array.prototype.concat(...files);
@@ -118,4 +119,68 @@ ipcMain.handle('select-directory', async () => {
     } else {
         return result.filePaths[0];
     }
+});
+
+ipcMain.handle('show-context-menu', async (event, { path: itemPath, type }) => {
+    const menu = new Menu();
+
+    menu.append(new MenuItem({
+        label: 'Open',
+        click: () => shell.openPath(itemPath)
+    }));
+
+    menu.append(new MenuItem({
+        label: 'Show in Explorer',
+        click: () => shell.showItemInFolder(itemPath)
+    }));
+
+    menu.append(new MenuItem({ type: 'separator' }));
+
+    menu.append(new MenuItem({
+        label: 'Open in VS Code',
+        click: () => {
+            exec(`code "${itemPath}"`, (error) => {
+                if (error) console.error('Failed to open VS Code:', error);
+            });
+        }
+    }));
+
+    menu.append(new MenuItem({
+        label: 'Open in Windsurf',
+        click: () => {
+            exec(`windsurf "${itemPath}"`, (error) => {
+                if (error) console.error('Failed to open Windsurf:', error);
+            });
+        }
+    }));
+
+    menu.append(new MenuItem({ type: 'separator' }));
+
+    menu.append(new MenuItem({
+        label: 'Copy Path',
+        click: () => {
+            clipboard.writeText(itemPath);
+        }
+    }));
+
+    menu.append(new MenuItem({
+        label: 'Remove from Project',
+        click: () => {
+            event.sender.send('remove-item', itemPath);
+        }
+    }));
+
+    menu.popup();
+});
+
+ipcMain.handle('run-command', async (event, command, cwd) => {
+    return new Promise((resolve) => {
+        exec(command, { cwd }, (error, stdout, stderr) => {
+            resolve({
+                error: error ? error.message : null,
+                stdout,
+                stderr
+            });
+        });
+    });
 });

@@ -121,13 +121,22 @@ export class SearchModal {
 
     renderResults() {
         const resultsContainer = this.container.querySelector('.search-results');
-        resultsContainer.innerHTML = this.results.map(file => `
+        resultsContainer.innerHTML = this.results.map(item => {
+            const icon = item.type === 'directory' ? '📁' : 'jq'; // Placeholder icon logic
+            // Better icon logic:
+            let displayIcon = '📄';
+            if (item.type === 'directory') displayIcon = '📁';
+            else if (item.name.endsWith('.blend')) displayIcon = '🧊';
+            else if (item.name.endsWith('.js')) displayIcon = '📜';
+
+            return `
       <div class="result-item">
-        <input type="checkbox" data-path="${file.path}" ${this.selectedFiles.has(file.path) ? 'checked' : ''}>
-        <span class="result-name">${file.name}</span>
-        <span class="result-path">${file.path}</span>
+        <input type="checkbox" data-path="${item.path}" ${this.selectedFiles.has(item.path) ? 'checked' : ''}>
+        <span class="result-icon">${displayIcon}</span>
+        <span class="result-name">${item.name}</span>
+        <span class="result-path">${item.path}</span>
       </div>
-    `).join('');
+    `}).join('');
 
         resultsContainer.querySelectorAll('input').forEach(cb => {
             cb.addEventListener('change', (e) => {

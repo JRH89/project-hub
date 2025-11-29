@@ -8,4 +8,7 @@ contextBridge.exposeInMainWorld('api', {
     selectDirectory: () => ipcRenderer.invoke('select-directory'),
     getIndexedFiles: () => ipcRenderer.invoke('get-indexed-files'),
     saveIndexedFiles: (files) => ipcRenderer.invoke('save-indexed-files', files),
+    showContextMenu: (item) => ipcRenderer.invoke('show-context-menu', item),
+    onRemoveItem: (callback) => ipcRenderer.on('remove-item', (event, path) => callback(path)),
+    runCommand: (command, cwd) => ipcRenderer.invoke('run-command', command, cwd),
 });
