@@ -20,9 +20,9 @@ jobs:
         run: npm install
         
       - name: Build Windows
-        run: npm run package:win
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "GH_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
+          npm run package:win
         
       - name: List release directory
         run: dir release
@@ -47,9 +47,9 @@ jobs:
         run: npm install
         
       - name: Build Linux
-        run: npm run package:linux
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "GH_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
+          npm run package:linux
         
       - name: List release directory
         run: ls -la release/
