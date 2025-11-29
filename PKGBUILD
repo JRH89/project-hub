@@ -24,6 +24,11 @@ package() {
     install -dm755 "$pkgdir/usr/lib/$pkgname"
     cp -r dist electron node_modules "$pkgdir/usr/lib/$pkgname/"
     
+    # Fix permissions
+    chmod -R 755 "$pkgdir/usr/lib/$pkgname"
+    find "$pkgdir/usr/lib/$pkgname" -type f -name "*.js" -exec chmod 644 {} \;
+    find "$pkgdir/usr/lib/$pkgname" -type f -name "*.json" -exec chmod 644 {} \;
+    
     # Install icon
     install -Dm644 public/icon.png "$pkgdir/usr/share/pixmaps/$pkgname.png"
     
@@ -42,6 +47,6 @@ EOF
     install -Dm755 /dev/stdin "$pkgdir/usr/bin/$pkgname" <<EOF
 #!/bin/sh
 cd /usr/lib/$pkgname
-exec electron . "\$@"
+exec electron electron/main.js "\$@"
 EOF
 }
