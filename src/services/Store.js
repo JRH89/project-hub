@@ -5,6 +5,9 @@ export const Store = {
     async saveProject(project) {
         return await window.api.saveProject(project);
     },
+    async saveProjects(projects) {
+        return await window.api.saveProjects(projects);
+    },
     async getIndexedFiles() {
         return await window.api.getIndexedFiles();
     },

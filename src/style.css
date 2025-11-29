@@ -26,7 +26,58 @@ body {
 
 #app {
   display: flex;
+  flex-direction: column;
   height: 100%;
+}
+
+.title-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 32px;
+  background: var(--sidebar-bg);
+  border-bottom: 1px solid var(--border-color);
+  padding: 0 15px;
+  -webkit-app-region: drag;
+}
+
+.title-bar-left h1 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.title-bar-right {
+  display: flex;
+  gap: 8px;
+  -webkit-app-region: no-drag;
+}
+
+.window-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: bold;
+  transition: background 0.2s;
+}
+
+.window-btn:hover {
+  background: var(--hover-color);
+}
+
+.window-btn.close:hover {
+  background: #e81123;
+  color: white;
+}
+
+.app-container {
+  display: flex;
+  flex: 1;
+  height: calc(100% - 32px);
 }
 
 button {
@@ -88,12 +139,69 @@ input:focus {
   color: white;
 }
 
+.project-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.project-list .star {
+  cursor: pointer;
+  font-size: 1rem;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.project-list .star:hover {
+  opacity: 1;
+}
+
+.project-list .favorite .star {
+  opacity: 1;
+}
+
+.project-list .name {
+  flex: 1;
+}
+
+.section-header {
+  padding: 10px 15px 5px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 5px;
+}
+
+.context-menu {
+  position: fixed;
+  background: var(--sidebar-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  min-width: 180px;
+}
+
+.menu-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-size: 0.9rem;
+}
+
+.menu-item:hover {
+  background-color: var(--hover-color);
+}
+
 /* Main Content */
 .main-content {
   flex: 1;
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 100%;
 }
 
 #file-list {

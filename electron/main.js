@@ -64,6 +64,11 @@ ipcMain.handle('save-project', (event, project) => {
     return true;
 });
 
+ipcMain.handle('save-projects', (event, projects) => {
+    store.set('projects', projects);
+    return true;
+});
+
 ipcMain.handle('get-indexed-files', () => {
     return store.get('indexedFiles', []);
 });
@@ -183,4 +188,14 @@ ipcMain.handle('run-command', async (event, command, cwd) => {
             });
         });
     });
+});
+
+ipcMain.handle('minimize-window', () => {
+    const win = BrowserWindow.getFocusedWindow();
+    if (win) win.minimize();
+});
+
+ipcMain.handle('close-window', () => {
+    const win = BrowserWindow.getFocusedWindow();
+    if (win) win.close();
 });

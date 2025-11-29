@@ -6,16 +6,27 @@ import { PromptModal } from './components/PromptModal.js';
 import { CLI } from './components/CLI.js';
 
 document.querySelector('#app').innerHTML = `
-  <div class="sidebar">
-    <div class="sidebar-header">
+  <div class="title-bar">
+    <div class="title-bar-left">
       <h1>Project Hub</h1>
-      <button id="add-project-btn" class="icon-btn">+</button>
     </div>
-    <div id="project-list"></div>
+    <div class="title-bar-right">
+      <button id="minimize-btn" class="window-btn">−</button>
+      <button id="close-btn" class="window-btn close">×</button>
+    </div>
   </div>
-  <div class="main-content">
-    <div id="file-list"></div>
-    <div id="cli-container"></div>
+  <div class="app-container">
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <h1>Projects</h1>
+        <button id="add-project-btn" class="icon-btn">+</button>
+      </div>
+      <div id="project-list"></div>
+    </div>
+    <div class="main-content">
+      <div id="file-list"></div>
+      <div id="cli-container"></div>
+    </div>
   </div>
   <div id="search-modal-container"></div>
   <div id="prompt-modal-container"></div>
@@ -30,6 +41,15 @@ const cli = new CLI(document.querySelector('#cli-container'));
 // Add project button handler
 document.querySelector('#add-project-btn').addEventListener('click', () => {
   projectList.addProject();
+});
+
+// Window control handlers
+document.querySelector('#minimize-btn').addEventListener('click', () => {
+  window.api.minimizeWindow();
+});
+
+document.querySelector('#close-btn').addEventListener('click', () => {
+  window.api.closeWindow();
 });
 
 // Event Bus
