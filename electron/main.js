@@ -3,14 +3,14 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import Store from 'electron-store';
 import { exec } from 'child_process';
-import { autoUpdater } from 'electron-updater';
+import pkg from 'electron-updater';
+const { autoUpdater } = pkg;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const store = new Store();
 
 // Update configuration
-autoUpdater.checkForUpdatesAndNotify = false;
-autoUpdater.autoDownload = store.get('autoUpdate', true);
+const autoUpdateEnabled = store.get('autoUpdate', true);
 
 // Update events
 autoUpdater.on('checking-for-update', () => {
@@ -22,6 +22,11 @@ autoUpdater.on('update-available', (info) => {
     const win = BrowserWindow.getAllWindows()[0];
     if (win) {
         win.webContents.send('update-available', info);
+    }
+    
+    // Auto-download if enabled
+    if (autoUpdateEnabled) {
+        autoUpdater.downloadUpdate();
     }
 });
 

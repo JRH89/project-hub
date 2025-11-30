@@ -4,7 +4,7 @@ import { FileList } from './components/FileList.js';
 import { SearchModal } from './components/SearchModal.js';
 import { PromptModal } from './components/PromptModal.js';
 import { CLI } from './components/CLI.js';
-import UpdateNotification from './components/UpdateNotification.js';
+import { UpdateNotification } from './components/UpdateNotification.js';
 
 document.querySelector('#app').innerHTML = `
   <div class="title-bar">
@@ -42,9 +42,8 @@ const cli = new CLI(document.querySelector('#cli-container'));
 
 // Render update notification
 const updateContainer = document.querySelector('#update-notification-container');
-const updateRoot = document.createElement('div');
-updateContainer.appendChild(updateRoot);
-updateRoot.render = UpdateNotification;
+const updateNotification = new UpdateNotification(updateContainer);
+window.updateNotification = updateNotification;
 
 // Add project button handler
 document.querySelector('#add-project-btn').addEventListener('click', () => {
