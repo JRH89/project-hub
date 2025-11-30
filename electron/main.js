@@ -6,6 +6,8 @@ import { exec } from 'child_process';
 import pkg from 'electron-updater';
 const { autoUpdater } = pkg;
 
+
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const store = new Store();
 
@@ -23,7 +25,7 @@ autoUpdater.on('update-available', (info) => {
     if (win) {
         win.webContents.send('update-available', info);
     }
-    
+
     // Auto-download if enabled
     if (autoUpdateEnabled) {
         autoUpdater.downloadUpdate();
