@@ -3,9 +3,59 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import Store from 'electron-store';
 import { exec } from 'child_process';
+import pkg from 'electron-updater';
+const { autoUpdater } = pkg;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const store = new Store();
+
+// Update configuration
+const autoUpdateEnabled = store.get('autoUpdate', true);
+
+// Update events
+autoUpdater.on('checking-for-update', () => {
+    console.log('Checking for update...');
+});
+
+autoUpdater.on('update-available', (info) => {
+    console.log('Update available:', info);
+    const win = BrowserWindow.getAllWindows()[0];
+    if (win) {
+        win.webContents.send('update-available', info);
+    }
+    
+    // Auto-download if enabled
+    if (autoUpdateEnabled) {
+        autoUpdater.downloadUpdate();
+    }
+});
+
+autoUpdater.on('update-not-available', (info) => {
+    console.log('Update not available:', info);
+});
+
+autoUpdater.on('error', (err) => {
+    console.error('Update error:', err);
+});
+
+autoUpdater.on('download-progress', (progressObj) => {
+    const win = BrowserWindow.getAllWindows()[0];
+    if (win) {
+        win.webContents.send('update-progress', {
+            percent: Math.round(progressObj.percent),
+            transferred: progressObj.transferred,
+            total: progressObj.total
+        });
+    }
+});
+
+autoUpdater.on('update-downloaded', (info) => {
+    console.log('Update downloaded:', info);
+    const win = BrowserWindow.getAllWindows()[0];
+    if (win) {
+        win.webContents.send('update-downloaded', info);
+    }
+});
 
 function createWindow() {
     const win = new BrowserWindow({
@@ -33,6 +83,13 @@ function createWindow() {
 
 app.whenReady().then(() => {
     createWindow();
+
+    // Check for updates on startup (only in production)
+    if (!process.env.NODE_ENV || process.env.NODE_ENV === 'production') {
+        setTimeout(() => {
+            autoUpdater.checkForUpdates();
+        }, 5000); // Check after 5 seconds
+    }
 
     app.on('activate', () => {
         if (BrowserWindow.getAllWindows().length === 0) {
@@ -198,4 +255,27 @@ ipcMain.handle('minimize-window', () => {
 ipcMain.handle('close-window', () => {
     const win = BrowserWindow.getFocusedWindow();
     if (win) win.close();
+});
+
+// Update-related IPC handlers
+ipcMain.handle('check-for-updates', () => {
+    autoUpdater.checkForUpdates();
+});
+
+ipcMain.handle('download-update', () => {
+    autoUpdater.downloadUpdate();
+});
+
+ipcMain.handle('install-update', () => {
+    autoUpdater.quitAndInstall();
+});
+
+ipcMain.handle('get-auto-update-setting', () => {
+    return store.get('autoUpdate', true);
+});
+
+ipcMain.handle('set-auto-update-setting', (event, enabled) => {
+    store.set('autoUpdate', enabled);
+    autoUpdater.autoDownload = enabled;
+    return true;
 });
