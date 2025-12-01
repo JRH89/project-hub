@@ -12,6 +12,7 @@ document.querySelector('#app').innerHTML = `
       <h1>Project Hub</h1>
     </div>
     <div class="title-bar-right">
+      <button id="check-updates-btn" class="window-btn" title="Check for updates" onclick="window.api.checkForUpdates()">🔄</button>
       <button id="minimize-btn" class="window-btn">−</button>
       <button id="close-btn" class="window-btn close">×</button>
     </div>
