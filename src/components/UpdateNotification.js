@@ -52,20 +52,7 @@ class UpdateNotification {
     }
 
     render() {
-        if (!this.show) {
-            this.container.innerHTML = `
-                <div class="update-checker">
-                    <button 
-                        onclick="window.updateNotification.handleCheckForUpdates()"
-                        class="check-updates-btn"
-                        title="Check for updates"
-                    >
-                        🔄
-                    </button>
-                </div>
-            `;
-            return;
-        }
+
 
         this.container.innerHTML = `
             <div class="update-notification">
