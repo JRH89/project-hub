@@ -31,7 +31,7 @@ sudo rpm -i project-hub-1.0.0.x86_64.rpm
 #### Arch Linux (AUR)
 ```bash
 # Clone the PKGBUILD
-git clone https://github.com/yourusername/project-hub.git
+git clone https://github.com/jrh89/project-hub.git
 cd project-hub
 makepkg -si
 
