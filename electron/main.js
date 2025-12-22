@@ -86,8 +86,8 @@ function createWindow() {
 app.whenReady().then(() => {
     createWindow();
 
-    // Check for updates on startup (only in production)
-    if (!process.env.NODE_ENV || process.env.NODE_ENV === 'production') {
+    // Check for updates on startup (only in production - when app is packaged)
+    if (app.isPackaged) {
         setTimeout(() => {
             autoUpdater.checkForUpdates();
         }, 5000); // Check after 5 seconds

@@ -52,7 +52,11 @@ class UpdateNotification {
     }
 
     render() {
-
+        // Only show if there's an update available
+        if (!this.show) {
+            this.container.innerHTML = '';
+            return;
+        }
 
         this.container.innerHTML = `
             <div class="update-notification">
