@@ -12,9 +12,9 @@ document.querySelector('#app').innerHTML = `
       <h1>Project Hub</h1>
     </div>
     <div class="title-bar-right">
-      <button id="check-updates-btn" class="window-btn" title="Check for updates" onclick="window.api.checkForUpdates()">🔄</button>
-      <button id="minimize-btn" class="window-btn">−</button>
-      <button id="close-btn" class="window-btn close">×</button>
+      <button id="check-updates-btn" class="window-btn" title="Check for updates" aria-label="Check for updates" onclick="window.api.checkForUpdates()">&#128260;</button>
+      <button id="minimize-btn" class="window-btn" aria-label="Minimize window">&minus;</button>
+      <button id="close-btn" class="window-btn close" aria-label="Close window">&times;</button>
     </div>
   </div>
   <div class="app-container">
