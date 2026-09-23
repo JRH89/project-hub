@@ -6,15 +6,23 @@ import { PromptModal } from './components/PromptModal.js';
 import { CLI } from './components/CLI.js';
 import { UpdateNotification } from './components/UpdateNotification.js';
 
+// NOTE: The title-bar control symbols below use explicit Unicode escape
+// sequences (\uXXXX / \u{XXXXX}) rather than literal multi-byte source
+// characters. This avoids mojibake caused by encoding-dependent literal
+// bytes when the source file is read/written with an unexpected encoding.
+const UPDATE_ICON = '\u{1F504}'; // ef ef update / refresh symbol
+const MINIMIZE_ICON = '\u2212'; // ef minus sign
+const CLOSE_ICON = '\u00D7'; // ef multiplication sign (X)
+
 document.querySelector('#app').innerHTML = `
   <div class="title-bar">
     <div class="title-bar-left">
       <h1>Project Hub</h1>
     </div>
     <div class="title-bar-right">
-      <button id="check-updates-btn" class="window-btn" title="Check for updates" onclick="window.api.checkForUpdates()">🔄</button>
-      <button id="minimize-btn" class="window-btn">−</button>
-      <button id="close-btn" class="window-btn close">×</button>
+      <button id="check-updates-btn" class="window-btn" title="Check for updates" aria-label="Check for updates" onclick="window.api.checkForUpdates()">${UPDATE_ICON}</button>
+      <button id="minimize-btn" class="window-btn" title="Minimize window" aria-label="Minimize window">${MINIMIZE_ICON}</button>
+      <button id="close-btn" class="window-btn close" title="Close window" aria-label="Close window">${CLOSE_ICON}</button>
     </div>
   </div>
   <div class="app-container">

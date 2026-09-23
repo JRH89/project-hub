@@ -10,7 +10,8 @@
   "homepage": "./",
   "scripts": {
     "dev": "concurrently \"vite\" \"wait-on tcp:5173 && electron .\"",
-    "build": "vite build",
+    "test": "node scripts/check-titlebar-regression.js",
+    "build": "npm run test && vite build",
     "preview": "vite preview",
     "package": "npm run build && electron-builder",
     "package:win": "npm run build && electron-builder --win",
