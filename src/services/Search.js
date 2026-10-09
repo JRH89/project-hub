@@ -13,6 +13,21 @@ export const Search = {
         console.log('✓ Search initialized with', files.length, 'files');
         console.log('Sample files:', files.slice(0, 5).map(f => f.name));
     },
+    /**
+     * Searches the initialized file index for entries matching the given query.
+     *
+     * The query is trimmed of surrounding whitespace before matching. If the
+     * trimmed query is blank (empty or whitespace-only), or if the search
+     * index has not been initialized yet via `init()`, an empty array is
+     * returned.
+     *
+     * @param {string} query - The raw search query; leading/trailing
+     *   whitespace is ignored.
+     * @returns {Array<Object>} An array of matching file objects (e.g.
+     *   `{ name, path, type }`) in ranked order. Note: these are the plain
+     *   file objects themselves, not Fuse.js result wrappers (which would
+     *   include `{ item, score, ... }`).
+     */
     search(query) {
         const normalizedQuery = typeof query === 'string' ? query.trim() : '';
 
