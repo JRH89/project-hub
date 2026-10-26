@@ -99,3 +99,19 @@ To create a new release:
 
 MIT
 
+
+
+## Filter projects
+
+Use **Filter projects** above the sidebar list to find projects by name. Matching
+ignores case and surrounding whitespace. Favorites stay grouped, and filtering
+never closes the selected project or changes saved records. Use **Clear filter**
+or Escape in the input to restore the full list. No matches and an empty project
+list have separate messages.
+
+Run the search and project-filter tests against the actual application modules:
+
+```bash
+node --test tests/*.test.js
+npm run build
+```

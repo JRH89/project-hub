@@ -588,3 +588,43 @@ button:hover {
   font-size: inherit;
   outline: none;
 }
+/* Filtering changes only the sidebar results; the active editor stays open. */
+#project-list {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+.project-filter-results { overflow-y: auto; min-height: 0; }
+
+.project-filter-controls {
+  display: grid;
+  gap: 8px;
+  padding: 0 16px 12px;
+}
+.project-filter-controls label {
+  font-size: 12px;
+  color: var(--text-color);
+}
+.project-filter-controls input,
+.project-filter-controls button {
+  min-width: 0;
+  width: 100%;
+  padding: 8px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background: var(--bg-color);
+  color: var(--text-color);
+  font: inherit;
+}
+.project-filter-controls button { cursor: pointer; }
+.project-filter-controls input:focus-visible,
+.project-filter-controls button:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+}
+.project-filter-empty {
+  padding: 8px 16px;
+  color: var(--text-color);
+  font-size: 13px;
+}
