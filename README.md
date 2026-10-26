@@ -74,6 +74,20 @@ npm run package
 
 Built packages will be in the `release/` directory.
 
+## Running tests
+
+Project Hub uses Node's built-in test runner. To run the test suite:
+
+```bash
+node --test tests/*.test.js
+```
+
+To verify the production build:
+
+```bash
+npm run build
+```
+
 ## Publishing Releases
 
 To create a new release:
@@ -98,4 +112,3 @@ To create a new release:
 ## License
 
 MIT
-
