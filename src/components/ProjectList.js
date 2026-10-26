@@ -1,4 +1,5 @@
 import { Store } from '../services/Store.js';
+import { filterProjects } from '../services/ProjectFilter.js';
 import { v4 as uuidv4 } from 'uuid';
 
 export class ProjectList {
@@ -6,6 +7,8 @@ export class ProjectList {
         this.container = container;
         this.promptModal = promptModal;
         this.projects = [];
+        this.filterQuery = '';
+        this.selectedProjectId = null;
         this.init();
     }
 
@@ -20,49 +23,101 @@ export class ProjectList {
     }
 
     render() {
-        const favorites = this.projects.filter(p => p.favorite);
-        const regular = this.projects.filter(p => !p.favorite);
-        
-        this.container.innerHTML = `
-      <ul class="project-list">
-        ${favorites.length > 0 ? `
-          <div class="section-header">Favorites</div>
-          ${favorites.map(p => `
-            <li data-id="${p.id}" class="favorite">
-              <span class="star">⭐</span>
-              <span class="name">${p.name}</span>
-            </li>
-          `).join('')}
-        ` : ''}
-        ${regular.length > 0 ? `
-          <div class="section-header">Projects</div>
-          ${regular.map(p => `
-            <li data-id="${p.id}">
-              <span class="star">☆</span>
-              <span class="name">${p.name}</span>
-            </li>
-          `).join('')}
-        ` : ''}
-      </ul>
-    `;
+        if (!this.filterInput) this.createFilterControls();
+        const matches = filterProjects(this.projects, this.filterQuery);
+        this.clearFilterButton.hidden = this.filterQuery.length === 0;
+        this.results.replaceChildren();
+        this.emptyState.hidden = matches.length > 0;
+        this.emptyState.textContent = this.projects.length === 0
+            ? 'No projects yet. Add a project to get started.'
+            : 'No projects found';
 
-        this.container.querySelectorAll('li').forEach(li => {
-            li.addEventListener('click', (e) => {
-                if (e.target.classList.contains('star')) {
-                    this.toggleFavorite(li.dataset.id);
-                } else {
-                    const project = this.projects.find(p => p.id === li.dataset.id);
-                    document.dispatchEvent(new CustomEvent('project-selected', { detail: project }));
-                    this.container.querySelectorAll('li').forEach(el => el.classList.remove('active'));
-                    li.classList.add('active');
-                }
-            });
+        for (const [heading, entries] of [
+            ['Favorites', matches.filter(project => project.favorite)],
+            ['Projects', matches.filter(project => !project.favorite)],
+        ]) {
+            if (entries.length === 0) continue;
+            const title = document.createElement('h2');
+            title.className = 'section-header';
+            title.textContent = heading;
+            const list = document.createElement('ul');
+            list.className = 'project-list';
+            entries.forEach(project => list.appendChild(this.createProjectRow(project)));
+            this.results.appendChild(title);
+            this.results.appendChild(list);
+        }
+    }
 
-            li.addEventListener('contextmenu', (e) => {
-                e.preventDefault();
-                this.showContextMenu(e, li.dataset.id);
-            });
+    createFilterControls() {
+        const controls = document.createElement('div');
+        controls.className = 'project-filter-controls';
+        const label = document.createElement('label');
+        label.textContent = 'Filter projects';
+        label.setAttribute('for', 'project-filter');
+        this.filterInput = document.createElement('input');
+        this.filterInput.id = 'project-filter';
+        this.filterInput.type = 'search';
+        this.filterInput.placeholder = 'Filter projects…';
+        this.filterInput.setAttribute('aria-label', 'Filter projects');
+        this.filterInput.addEventListener('input', () => {
+            this.filterQuery = this.filterInput.value;
+            this.render();
         });
+        this.filterInput.addEventListener('keydown', event => {
+            if (event.key === 'Escape') {
+                event.preventDefault();
+                this.clearFilter();
+            }
+        });
+        this.clearFilterButton = document.createElement('button');
+        this.clearFilterButton.type = 'button';
+        this.clearFilterButton.textContent = 'Clear filter';
+        this.clearFilterButton.addEventListener('click', () => this.clearFilter());
+        controls.appendChild(label);
+        controls.appendChild(this.filterInput);
+        controls.appendChild(this.clearFilterButton);
+        this.results = document.createElement('div');
+        this.results.className = 'project-filter-results';
+        this.emptyState = document.createElement('p');
+        this.emptyState.className = 'project-filter-empty';
+        this.emptyState.setAttribute('role', 'status');
+        // Keep the input mounted while results change so typing retains focus and caret.
+        this.container.replaceChildren(controls, this.results, this.emptyState);
+    }
+
+    clearFilter() {
+        this.filterQuery = '';
+        this.filterInput.value = '';
+        this.render();
+        this.filterInput.focus();
+    }
+
+    createProjectRow(project) {
+        const row = document.createElement('li');
+        row.dataset.id = project.id;
+        if (project.favorite) row.classList.add('favorite');
+        if (project.id === this.selectedProjectId) row.classList.add('active');
+        const star = document.createElement('span');
+        star.className = 'star';
+        star.textContent = project.favorite ? '⭐' : '☆';
+        const name = document.createElement('span');
+        name.className = 'name';
+        // Stored project names are user data, never markup.
+        name.textContent = typeof project.name === 'string' ? project.name : '';
+        row.appendChild(star);
+        row.appendChild(name);
+        row.addEventListener('click', event => {
+            if (event.target.classList.contains('star')) return this.toggleFavorite(project.id);
+            this.selectedProjectId = project.id;
+            this.container.querySelectorAll('li[data-id]').forEach(item => item.classList.remove('active'));
+            row.classList.add('active');
+            document.dispatchEvent(new CustomEvent('project-selected', { detail: project }));
+        });
+        row.addEventListener('contextmenu', event => {
+            event.preventDefault();
+            this.showContextMenu(event, project.id);
+        });
+        return row;
     }
 
     async addProject() {
